@@ -222,13 +222,26 @@ ORDER BY industry_rank;
 **Year-on-year growth — LAG window function, 2019–2025:**
 
 ```sql
--- Growth % = [(This Year - Last Year) / Last Year] * 100
 -- LAG offset of 12 months partitioned by state and industry
 -- captures true same-period comparison across every category
-LAG(turnover_millions, 12) OVER (
-    PARTITION BY state, industry
-    ORDER BY reporting_date
-)
+SELECT
+	state, industry, reporting_date, year, month, month_no,
+	turnover_millions,
+	-- Growth % = [(This Year - Last Year) / Last Year] * 100
+	ROUND(
+            (
+                (turnover_millions - LAG(turnover_millions, 12) OVER (
+                    PARTITION BY state, industry ORDER BY reporting_date
+                ))
+                / NULLIF(LAG(turnover_millions, 12) OVER (
+                    PARTITION BY state, industry ORDER BY reporting_date
+                ), 0)
+            ) * 100
+        , 2) AS yoy_growth_pct
+FROM retail_clean
+WHERE reporting_date BETWEEN '2019-01-01' AND '2025-06-01'
+      AND industry NOT IN (/* five parent aggregate exclusions */)
+ORDER BY state, industry, reporting_date;
 ```
 
 **National monthly trend — aggregated turnover, 2019–2025:**
@@ -291,15 +304,13 @@ table data export function and saved to `data/` for consumption by Excel
 =ROUND(SUMIF(monthly_trend[year],2024,monthly_trend[national_turnover_m])/1000,1)&" B"
 
 -- Average YoY Growth 2024
-=IFERROR(ROUND(AVERAGEIFS(yoy_growth[yoy_growth_pct],yoy_growth[year],2024,
-         yoy_growth[yoy_growth_pct],"<>"&""),1)&"%","N/A")
+=ROUND(AVERAGEIFS(yoy_growth[yoy_growth_pct],yoy_growth[year],2024),1)&"%"
 
 -- Top State
-=INDEX(state_summary[State],MATCH(MAX(state_summary[total_turnover_m]),
-       state_summary[total_turnover_m],0))
+=INDEX(state_summary!A2:A9,MATCH(MAX(state_summary!B2:B9),state_summary!B2:B9,0))
 
 -- Top Industry
-=INDEX(IndustryData[industry],MATCH(1,IndustryData[industry_rank],0))
+=INDEX(industry_rank[industry],MATCH(1,industry_rank[industry_rank],0))
 ```
 
 ---
