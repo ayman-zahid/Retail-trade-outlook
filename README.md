@@ -59,7 +59,7 @@ quality, methodological rigour, and business-level insight communication.
 ```
 retail-trade-outlook/
 │
-├── data/
+├── data (clean)/
 │   ├── abs_retail_trade.csv           # Cleaned source data (Excel Power Query output)
 │   ├── state_summary.csv              # State-level turnover aggregates (SQL export)
 │   ├── industry_rank.csv              # Industry ranking by total turnover (SQL export)
@@ -229,14 +229,12 @@ SELECT
 	turnover_millions,
 	-- Growth % = [(This Year - Last Year) / Last Year] * 100
 	ROUND(
-            (
-                (turnover_millions - LAG(turnover_millions, 12) OVER (
+            ((turnover_millions - LAG(turnover_millions, 12) OVER (
                     PARTITION BY state, industry ORDER BY reporting_date
                 ))
                 / NULLIF(LAG(turnover_millions, 12) OVER (
                     PARTITION BY state, industry ORDER BY reporting_date
-                ), 0)
-            ) * 100
+                ), 0)) * 100
         , 2) AS yoy_growth_pct
 FROM retail_clean
 WHERE reporting_date BETWEEN '2019-01-01' AND '2025-06-01'
@@ -268,7 +266,7 @@ multi-column indexing, staging table ingestion pattern.
 ### Stage 6 — Result export
 
 All four query result sets were exported to CSV using pgAdmin's built-in
-table data export function and saved to `data/` for consumption by Excel
+table data export function and saved to `data (clean)/` for consumption by Excel
 (via Power Query) and Power BI (via Get Data → Text/CSV).
 
 ---
@@ -449,6 +447,9 @@ aggregate and merit independent monitoring.
 ## Methodological Notes
 
 **ABS confidentiality suppression:**
+
+![Row Count Per State](images/sql_row_count_per_state.png)
+
 Row counts vary by state due to ABS suppression of turnover data for low-volume
 markets, most notably affecting South Australia, Queensland, Tasmania, and the
 Northern Territory. Suppressed values were excluded during ETL rather than imputed
