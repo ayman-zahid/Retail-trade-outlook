@@ -184,7 +184,7 @@ across the analytical queries.
 
 Row counts, distinct value counts per state and industry, and date range
 validation are run to confirm complete and correct ingestion before any
-analysis is performed. Uneven row counts by state are expected and documented —
+analysis is performed. Uneven row counts by state are expected and documented;
 they reflect ABS confidentiality suppression of low-volume markets rather than
 a pipeline error.
 
@@ -316,9 +316,6 @@ table data export function and saved to `data (clean)/` for consumption by Excel
 ## Power BI Dashboard
 
 **File:** `powerbi/retail_outlook_dashboard.pdf`
-
-The dashboard comprises two pages with a consistent dark-header KPI strip
-design and white-card visual layout on a warm grey canvas.
 
 ### Page 1 — National Retail Trade Outlook
 
