@@ -1,4 +1,4 @@
-# Retail Trade Outlook — Australian Retail Market Analysis
+# Retail Trade Outlook: Australian Retail Market Analysis
 
 **An end-to-end data analytics project** analysing Australian retail trade turnover
 across 8 states, 15 industry categories, and 15+ years of ABS data — delivering
@@ -79,7 +79,8 @@ retail-trade-outlook/
 ├── images/
 │   ├── excel_dashboard_preview.png    # Excel KPI dashboard screenshot
 │   ├── powerbi_dashboard_pg1.png      # Power BI — National Retail Trade Outlook page
-│   └── powerbi_dashboard_pg2.png      # Power BI — Industry-level Insights page
+│   ├── powerbi_dashboard_pg2.png      # Power BI — Industry-level Insights page
+│   └── sql_row_count_per_state.png    # SQL  — Observations per State screenshot
 │
 └── README.md
 ```
@@ -110,17 +111,17 @@ Raw ABS data was downloaded as a wide-format CSV with metadata header rows
 and industry categories as columns. The following ETL steps were performed
 before SQL ingestion:
 
-1. **Metadata removal** — Rows 1–11 (Unit, Series Type, Data Type, Frequency, Collection Month fields) were deleted, retaining only the data header row.
-2. **Unpivoting** — Microsoft Excel Power Query was used to unpivot all industry columns into a long-format structure with four fields: `reporting_date`, `state`, `industry`, `turnover_millions`.
-3. **Null exclusion** — Empty cells arising from ABS confidentiality suppression of low-volume markets were automatically dropped during unpivoting, preventing zero-inflation of downstream aggregations.
-4. **Date formatting** — The `reporting_date` column was confirmed in `DD/MM/YYYY` format consistent with Australian locale settings, handled explicitly in the PostgreSQL `TO_DATE()` function.
-5. **CSV export** — The cleaned dataset was exported as UTF-8 CSV for PostgreSQL ingestion.
+1. **Metadata removal:** Rows 1–11 (Unit, Series Type, Data Type, Frequency, Collection Month fields) were deleted, retaining only the data header row.
+2. **Unpivoting:** Microsoft Excel Power Query was used to unpivot all industry columns into a long-format structure with four fields: `reporting_date`, `state`, `industry`, `turnover_millions`.
+3. **Null exclusion:** Empty cells arising from ABS confidentiality suppression of low-volume markets were automatically dropped during unpivoting, preventing zero-inflation of downstream aggregations.
+4. **Date formatting:** The `reporting_date` column was confirmed in `DD/MM/YYYY` format consistent with Australian locale settings, handled explicitly in the PostgreSQL `TO_DATE()` function.
+5. **CSV export:** The cleaned dataset was exported as UTF-8 CSV for PostgreSQL ingestion.
 
 ### Hierarchical Double-Counting Correction
 
 The ABS classification structure includes both granular leaf-level industry rows
 **and** their parent aggregate category rows within the same dataset. Including
-both in SUM aggregations produces inflated totals — a non-obvious data quality
+both in SUM aggregations produces inflated totals, a non-obvious data quality
 issue requiring domain knowledge of the ABS taxonomy to identify and correct.
 
 The following five parent categories were identified and excluded from all
@@ -420,8 +421,8 @@ true economic footprint of Australia's retail sector across a 15-year period.
 
 **7. Supermarket and grocery stores account for 34% of all Australian retail turnover — a structural dominance no other category approaches.**
 With approximately $1.70 trillion in cumulative turnover, supermarket and grocery stores
-represent more than one-third of total retail activity. The next largest category —
-Cafes, restaurants and catering services at $0.41T — represents less than a quarter of
+represent more than one-third of total retail activity. The next largest category,
+Cafes, restaurants and catering services at $0.41T, represents less than a quarter of
 that figure, reflecting the non-discretionary nature of food spending.
 
 **8. Pareto analysis confirms approximately 4 industries generate the dominant share of Australian retail turnover.**
