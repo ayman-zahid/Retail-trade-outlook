@@ -444,9 +444,9 @@ aggregate and merit independent monitoring.
 
 ## Methodological Notes
 
-**ABS confidentiality suppression:**
-
 ![Row Count Per State](images/sql_row_count_per_state.png)
+
+**ABS confidentiality suppression:**
 
 Row counts vary by state due to ABS suppression of turnover data for low-volume
 markets, most notably affecting South Australia, Queensland, Tasmania, and the
